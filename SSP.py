@@ -175,7 +175,7 @@ def tabu_search_algorithm(numbers_array ,target, max_iterations = 1000, tabu_ten
             key = str(neighbor)
             score = objective_function(neighbor, numbers_array, target)
 
-            if key not in tabu_set or score < best_score:
+            if key not in tabu_set or score < best_score: # bez ora 
                 valid_neighbors.append((neighbor, score))
         
         # If there are no neighbors we backtrack in the move stack
@@ -236,6 +236,7 @@ def temperature_function(scheme, T0, k, alpha=0.95, beta=1.0): # T0 is the initi
     if scheme == 'linear':
         return max(T0 - beta * k, 1e-8)
 
+# z gaussa wylosowac ile bitow zmienic
 def get_neighbor_normal_dist(solution_vector, mu, sigma): # mu is the mean, sigma is the standard deviation
     n = len(solution_vector)
     neighbor = solution_vector.copy()
@@ -330,7 +331,6 @@ def bit_flip_mutation(chromosome, mutation_rate):
             chromosome[i] = 1 - chromosome[i]
     return chromosome
 
-
 # Swaps 2 indexes with each other
 def swap_mutation(chromosome, mutation_rate):
     if random.random() <= mutation_rate:
@@ -422,8 +422,13 @@ if __name__ == "__main__":
     parser.add_argument('--size', type=int, default=10, help='Size of the numbers array')
     parser.add_argument('--min_val', type=int, default=0, help='Minimum value for random numbers')
     parser.add_argument('--max_val', type=int, default=50, help='Maximum value for random numbers')
+    parser.add_argument('--tabu_tenure', type=int, default=10, help='Size of tabu tenure')
     parser.add_argument('--target', type=int, help='Target sum (if not provided, will be random)')
     parser.add_argument('--iterations', type=int, default=1000, help='Maximum iterations')
+    parser.add_argument('--alpha', type=float, default=0.95, help='Alpha cooling rate')
+    parser.add_argument('--temperature', type=float, default=100 , help='Temperature start value')
+    parser.add_argument('--cooling_scheme', choices=['logarithmic', 'geometric', 'linear'], default='geometric', help="Cooling algorithm used for simmulated annealing ['logarithmic', 'geometric', 'linear']]")
+    parser.add_argument('--beta', type=int, default=1, help='Beta cooling rate')
     parser.add_argument('--population_size', type=int, default=20, help='Population size for GA')
     parser.add_argument('--crossover', choices=['one_point', 'uniform'], default='one_point', help='Crossover method for GA')
     parser.add_argument('--mutation', choices=['bit_flip', 'swap'], default='bit_flip', help='Mutation method for GA')
@@ -454,9 +459,9 @@ if __name__ == "__main__":
     elif args.algorithm == 'hill_climbing_rand':
         hill_climbing_random_neighbor_algorithm(numbers, target, args.iterations)
     elif args.algorithm == 'tabu':
-        tabu_search_algorithm(numbers, target, args.iterations, 10)
+        tabu_search_algorithm(numbers, target, args.iterations, args.tabu_tenure)
     elif args.algorithm == 'simulated_annealing':
-        simulated_annealing_algorithm(numbers, target, args.iterations, 100, "geometric", 0.95, 0.1)
+        simulated_annealing_algorithm(numbers, target, args.iterations, args.temperature, args.cooling_scheme, args.alpha, args.beta)
     elif args.algorithm == 'genetic':
         genetic_algorithm(numbers, target, args.iterations, args.population_size, True, 
                          args.crossover, args.mutation, 0.01, args.termination)

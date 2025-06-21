@@ -1,8 +1,18 @@
 import math
 import random
 import argparse
+import csv
 
 # ------------- Defining helper functions ------------- 
+
+# Load problem from CSV file
+def load_problem_from_csv(csv_file):
+    with open(csv_file, 'r') as file:
+        reader = csv.reader(file)
+        rows = list(reader)
+        target = int(rows[0][0])
+        numbers = [int(x.strip()) for x in rows[1]]
+        return numbers, target
 
 # Defining our objective function, the closer it is to 0 the better
 def objective_function(solution_vector, numbers, target_sum):
@@ -59,7 +69,7 @@ def brute_force_algorithm(numbers_array ,target):
 
 # In our case of a Subset Sum Problem we'll be looking at neighbors as one bitflip in our solution array.
 # Each iteration will have new n-1 neighbors and iterate as long as the score goes closer to 0. It stops when score cannot get better.
-def hill_climbing_deterministic_algorithm(numbers_array ,target, max_iterations = 1000):
+def hill_climbing_deterministic_algorithm(numbers_array , target, max_iterations = 1000):
     print('Hill climb algorithm - deterministic method:')
     n = len(numbers_array)
     current_solution = generate_random_solution(n)
@@ -293,6 +303,8 @@ def select_parents(population, fitness_scores):
 # Crossover methods:
 def one_point_crossover(parent1, parent2):
     n = len(parent1)
+    if n <= 1:
+        return parent1.copy(), parent2.copy()
     crossover_point = random.randint(1, n - 1)
     child1 = parent1[:crossover_point] + parent2[crossover_point:]
     child2 = parent2[:crossover_point] + parent1[crossover_point:]
@@ -340,12 +352,13 @@ def genetic_algorithm(numbers_array ,target, max_generations = 1000, population_
     
     n = len(numbers_array)
 
-    global_best_solution = None
+    population = [generate_random_solution(n) for _ in range(population_size)]
+    
+    # Initialize with the first solution to avoid None issues
+    global_best_solution = population[0].copy()
     global_best_fitness = -1
     generations_without_improvement = 0
     last_best_fitness = -1
-
-    population = [generate_random_solution(n) for _ in range(population_size)]
 
     for generation in range(max_generations):
         print(f'[{generation}] Generation')
@@ -356,7 +369,7 @@ def genetic_algorithm(numbers_array ,target, max_generations = 1000, population_
 
         if best_fitness > global_best_fitness:
             global_best_fitness = best_fitness
-            global_best_solution = best_solution
+            global_best_solution = best_solution.copy()
             generations_without_improvement = 0
         else:
             generations_without_improvement += 1
@@ -409,6 +422,7 @@ def genetic_algorithm(numbers_array ,target, max_generations = 1000, population_
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Subset Sum Problem - Metaheuristics')
     parser.add_argument('--algorithm', choices=['brute_force', 'hill_climbing_det', 'hill_climbing_rand', 'tabu', 'simulated_annealing', 'genetic'], default='genetic', help='Algorithm to use')
+    parser.add_argument('--csv_file', type=str, help='CSV file to load problem from (overrides random generation)')
     parser.add_argument('--size', type=int, default=10, help='Size of the numbers array')
     parser.add_argument('--min_val', type=int, default=0, help='Minimum value for random numbers')
     parser.add_argument('--max_val', type=int, default=50, help='Maximum value for random numbers')
@@ -418,28 +432,20 @@ if __name__ == "__main__":
     parser.add_argument('--crossover', choices=['one_point', 'uniform'], default='one_point', help='Crossover method for GA')
     parser.add_argument('--mutation', choices=['bit_flip', 'swap'], default='bit_flip', help='Mutation method for GA')
     parser.add_argument('--termination', choices=['generations', 'convergence'], default='generations', help='Termination condition for GA')
-    parser.add_argument('--numbers', type=str, help='Custom numbers array (comma-separated, e.g., "1,2,3,4,5")')
     
     args = parser.parse_args()
     
-    # Generate problem instance
-    if args.numbers:
-        # Parse custom numbers array
-        try:
-            numbers = [int(x.strip()) for x in args.numbers.split(',')]
-            print(f"Using custom numbers array: {numbers}")
-        except ValueError:
-            print("Error: Invalid numbers format. Use comma-separated integers (e.g., '1,2,3,4,5')")
-            exit(1)
+    # Load problem from CSV or generate random problem
+    if args.csv_file:
+        numbers, target = load_problem_from_csv(args.csv_file)
+        print(f"Loaded problem from CSV file: {args.csv_file}")
     else:
-        # Generate random numbers
+        # Generate problem instance
         numbers = generate_random_number_vector(args.min_val, args.max_val, args.size)
-        print(f"Generated random numbers: {numbers}")
-    
-    if args.target is None:
-        target = random.randint(args.min_val, args.max_val)
-    else:
-        target = args.target
+        if args.target is None:
+            target = random.randint(args.min_val, args.max_val)
+        else:
+            target = args.target
     
     print(f"Problem: Find subset of {numbers} that sums to {target}")
     print(f"Algorithm: {args.algorithm}")

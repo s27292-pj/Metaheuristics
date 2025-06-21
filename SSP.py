@@ -326,14 +326,14 @@ def uniform_crossover(parent1, parent2):
 # mutation % rate for each index
 def bit_flip_mutation(chromosome, mutation_rate):
     for i in range(len(chromosome)):
-        if random.random() < mutation_rate:
+        if random.random() <= mutation_rate:
             chromosome[i] = 1 - chromosome[i]
     return chromosome
 
 
 # Swaps 2 indexes with each other
 def swap_mutation(chromosome, mutation_rate):
-    if random.random() < mutation_rate:
+    if random.random() <= mutation_rate:
         n = len(chromosome)
         if n > 1:
             idx1, idx2 = random.sample(range(n), 2) # random sample of 2 indexes from the chromosome
@@ -352,8 +352,6 @@ def genetic_algorithm(numbers_array ,target, max_generations = 1000, population_
     n = len(numbers_array)
 
     population = [generate_random_solution(n) for _ in range(population_size)]
-    
-    # Initialize with the first solution to avoid None issues
     global_best_solution = population[0].copy()
     global_best_fitness = -1
     generations_without_improvement = 0

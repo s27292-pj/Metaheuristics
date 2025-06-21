@@ -408,8 +408,7 @@ def genetic_algorithm(numbers_array ,target, max_generations = 1000, population_
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Subset Sum Problem - Metaheuristics')
-    parser.add_argument('--algorithm', choices=['brute_force', 'hill_climbing_det', 'hill_climbing_rand', 'tabu', 'simulated_annealing', 'genetic'], 
-                       default='genetic', help='Algorithm to use')
+    parser.add_argument('--algorithm', choices=['brute_force', 'hill_climbing_det', 'hill_climbing_rand', 'tabu', 'simulated_annealing', 'genetic'], default='genetic', help='Algorithm to use')
     parser.add_argument('--size', type=int, default=10, help='Size of the numbers array')
     parser.add_argument('--min_val', type=int, default=0, help='Minimum value for random numbers')
     parser.add_argument('--max_val', type=int, default=50, help='Maximum value for random numbers')

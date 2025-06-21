@@ -418,11 +418,24 @@ if __name__ == "__main__":
     parser.add_argument('--crossover', choices=['one_point', 'uniform'], default='one_point', help='Crossover method for GA')
     parser.add_argument('--mutation', choices=['bit_flip', 'swap'], default='bit_flip', help='Mutation method for GA')
     parser.add_argument('--termination', choices=['generations', 'convergence'], default='generations', help='Termination condition for GA')
+    parser.add_argument('--numbers', type=str, help='Custom numbers array (comma-separated, e.g., "1,2,3,4,5")')
     
     args = parser.parse_args()
     
     # Generate problem instance
-    numbers = generate_random_number_vector(args.min_val, args.max_val, args.size)
+    if args.numbers:
+        # Parse custom numbers array
+        try:
+            numbers = [int(x.strip()) for x in args.numbers.split(',')]
+            print(f"Using custom numbers array: {numbers}")
+        except ValueError:
+            print("Error: Invalid numbers format. Use comma-separated integers (e.g., '1,2,3,4,5')")
+            exit(1)
+    else:
+        # Generate random numbers
+        numbers = generate_random_number_vector(args.min_val, args.max_val, args.size)
+        print(f"Generated random numbers: {numbers}")
+    
     if args.target is None:
         target = random.randint(args.min_val, args.max_val)
     else:

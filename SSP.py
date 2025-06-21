@@ -49,7 +49,7 @@ def brute_force_algorithm(numbers_array ,target):
 
     for mask in range(2 ** n): # All combinations are 2 to the N in this case ( 0 to 2^n -1)
         solution_vector = []
-        for i in range(n):      # Generating binary vector that represents the mask i.e. mask 7 = [0,1,1,1]
+        for i in range(n):      # Generating binary vector that represents the mask i.e. mask 7 = [1,1,1,0]
             if ( math.floor(mask / (2**i))) % 2 == 1: # If mask divided to floor by 2^i mod 2 then append
                 solution_vector.append(1)
             else:
@@ -178,7 +178,7 @@ def tabu_search_algorithm(numbers_array ,target, max_iterations = 1000, tabu_ten
             if key not in tabu_set or score < best_score:
                 valid_neighbors.append((neighbor, score))
         
-        # If there are no neighbors we backtract in the move stack
+        # If there are no neighbors we backtrack in the move stack
         if not valid_neighbors:
             if backtrack_stack:
                 print(f'[{i}] No valid moves. Backtracking...')
@@ -287,7 +287,6 @@ def simulated_annealing_algorithm(numbers_array ,target, max_iterations = 1000, 
 
 # ------------- Genetic algorithms ------------- 
 
-# Choosing Genetic Algorithm instead of Evolutionary Algorithm as it fits better SSP
 def fitness(solution_vector, numbers, target_sum):
     score = objective_function(solution_vector, numbers, target_sum)
     return 1 / (1 + score)
@@ -358,7 +357,6 @@ def genetic_algorithm(numbers_array ,target, max_generations = 1000, population_
     global_best_solution = population[0].copy()
     global_best_fitness = -1
     generations_without_improvement = 0
-    last_best_fitness = -1
 
     for generation in range(max_generations):
         print(f'[{generation}] Generation')
